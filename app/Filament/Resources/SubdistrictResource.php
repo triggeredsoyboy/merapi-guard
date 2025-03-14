@@ -94,6 +94,14 @@ class SubdistrictResource extends Resource
                                     ->maxLength(100)
                                     ->autocomplete(false)
                                     ->required(),
+                                Forms\Components\Select::make('proneAreas')
+                                    ->native(false)
+                                    ->relationship(titleAttribute: 'name')
+                                    ->preload()
+                                    ->multiple()
+                                    ->minItems(1)
+                                    ->maxItems(3)
+                                    ->required(),
                                 Forms\Components\Placeholder::make('created_at')
                                     ->content(fn(Subdistrict $record): ?string => $record->created_at?->format('j M Y, H:i'))
                                     ->hidden(fn(?Subdistrict $record) => $record === null),
@@ -113,6 +121,9 @@ class SubdistrictResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('proneAreas.name')
+                    ->badge()
+                    ->limitList(1),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime('j M Y, H:i'),
             ])
@@ -181,6 +192,8 @@ class SubdistrictResource extends Resource
                         Infolists\Components\Section::make()
                             ->schema([
                                 Infolists\Components\TextEntry::make('slug'),
+                                Infolists\Components\TextEntry::make('proneAreas.name')
+                                    ->badge(),
                                 Infolists\Components\TextEntry::make('created_at')
                                     ->dateTime('j M Y, H:i'),
                                 Infolists\Components\TextEntry::make('updated_at')

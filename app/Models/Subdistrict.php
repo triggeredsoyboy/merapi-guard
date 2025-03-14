@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Subdistrict extends Model
 {
@@ -35,5 +36,13 @@ class Subdistrict extends Model
         return [
             'vulnerability' => 'array',
         ];
+    }
+
+    /**
+     * The prone areas that belong to the subdistrict.
+     */
+    public function proneAreas(): BelongsToMany
+    {
+        return $this->belongsToMany(ProneArea::class);
     }
 }

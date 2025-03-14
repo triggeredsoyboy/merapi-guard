@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProneArea extends Model
 {
@@ -23,5 +24,13 @@ class ProneArea extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * The subdistricts that belong to the prone area.
+     */
+    public function subdistricts(): BelongsToMany
+    {
+        return $this->belongsToMany(Subdistrict::class, 'prone_area_subdistrict');
     }
 }

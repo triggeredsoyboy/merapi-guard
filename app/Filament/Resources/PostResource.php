@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Filament\Notifications\Notification;
 
 class PostResource extends Resource
 {
@@ -118,20 +119,46 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('title')
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('is_published')
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('published_at')
+                    ->placeholder('This post isn\'t published yet.')
+                    ->dateTime('j M Y, H:i'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime('j M Y, H:i'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->icon(''),
+                    Tables\Actions\DeleteAction::make()
+                        ->icon('')
+                        ->successNotification(
+                            Notification::make()
+                                ->success()
+                                ->title('Success')
+                                ->body('The post has been deleted successfully.'),
+                        ),
+                ]),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+                Tables\Actions\DeleteBulkAction::make()
+                    ->icon('')
+                    ->successNotification(
+                        Notification::make()
+                            ->success()
+                            ->title('Success')
+                            ->body('The selected posts has been deleted successfully.'),
+                    ),
+            ])
+            ->recordUrl(
+                fn(Post $record): string => route('filament.admin.resources.posts.view', ['record' => $record]),
+            );
     }
 
     public static function getRelations(): array

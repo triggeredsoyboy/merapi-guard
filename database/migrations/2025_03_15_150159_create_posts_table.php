@@ -19,6 +19,8 @@ return new class extends Migration
             $table->json('body');
             $table->boolean('is_published');
             $table->timestamp('published_at')->nullable();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

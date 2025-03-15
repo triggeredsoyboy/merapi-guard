@@ -46,9 +46,14 @@ class PostResource extends Resource
 
                                         $set('slug', Str::slug($state));
                                     }),
+                                Forms\Components\Placeholder::make('user.name')
+                                    ->label('Author')
+                                    ->content(fn(Post $record): ?string => $record->user['name'])
+                                    ->visibleOn('view'),
                                 Forms\Components\RichEditor::make('excerpt')
                                     ->string()
-                                    ->minLength(0),
+                                    ->minLength(0)
+                                    ->required(),
                             ])
                             ->compact(),
                         Forms\Components\Builder::make('body')
@@ -102,14 +107,22 @@ class PostResource extends Resource
                                     ->disabled(fn(Forms\Get $get): bool => !$get('is_published'))
                                     ->dehydrated(fn(?string $state): bool => filled($state))
                                     ->required(fn(Forms\Get $get): bool => $get('is_published')),
-                                Forms\Components\Placeholder::make('created_at')
-                                    ->content(fn(Post $record): ?string => $record->created_at?->format('j M Y, H:i'))
-                                    ->hidden(fn(?Post $record) => $record === null),
-                                Forms\Components\Placeholder::make('updated_at')
-                                    ->content(fn(Post $record): ?string => $record->created_at?->format('j M Y, H:i'))
-                                    ->hidden(fn(?Post $record) => $record === null),
+                                Forms\Components\Select::make('category_id')
+                                    ->native(false)
+                                    ->relationship(name: 'category', titleAttribute: 'name')
+                                    ->preload()
+                                    ->required(),
                             ])
                             ->compact(),
+                        Forms\Components\Section::make()
+                            ->schema([
+                                Forms\Components\Placeholder::make('created_at')
+                                    ->content(fn(Post $record): ?string => $record->created_at?->format('j M Y, H:i')),
+                                Forms\Components\Placeholder::make('updated_at')
+                                    ->content(fn(Post $record): ?string => $record->created_at?->format('j M Y, H:i')),
+                            ])
+                            ->compact()
+                            ->hidden(fn(?Post $record) => $record === null),
                     ])
                     ->columnSpan(['lg' => 1]),
             ])->columns(3);
@@ -121,11 +134,15 @@ class PostResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->badge(),
                 Tables\Columns\IconColumn::make('is_published')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('published_at')
                     ->placeholder('This post isn\'t published yet.')
                     ->dateTime('j M Y, H:i'),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Author'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime('j M Y, H:i'),
             ])

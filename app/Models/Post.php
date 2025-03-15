@@ -33,6 +33,7 @@ class Post extends Model
     protected function casts(): array
     {
         return [
+            'body' => 'array',
             'is_published' => 'boolean',
             'published_at' => 'datetime',
         ];
